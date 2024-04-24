@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password = htmlspecialchars($_POST["password"]);
 
         // Prepare SQL statement to fetch the hashed password and role for the given username
-        $stmt = $conn->prepare("SELECT password, role FROM users WHERE username = ?");
+        $stmt = $conn->prepare("SELECT password, role, id FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $row = $result->fetch_assoc();
             $hashed_password = $row['password'];
             $role = $row['role'];
+            $userId = $row['id'];
 
             // Verify the password against the hashed value
             if (password_verify($password, $hashed_password)) {
@@ -32,6 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $username;
                 $_SESSION['logged_in'] = true;
                 $_SESSION['role'] = $role;
+                $_SESSION['userid'] = $userid;
                 
                 // Return success message to JavaScript
                 echo "success";
