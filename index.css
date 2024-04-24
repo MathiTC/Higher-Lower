@@ -56,7 +56,9 @@ body {
 }
 
 .subjectImage {
-    max-width: 100%; /* Ensure images don't exceed their container width */
+    width: 100%; /* Make sure the image fills its container */
+    height: 100%; /* Make sure the image fills its container */
+    object-fit: contain; /* Maintain aspect ratio while fitting within the container */
 }
 
 
