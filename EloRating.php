@@ -12,7 +12,6 @@ if (empty($category)) {
     $category = 'Global';
 }
 
-
 // Default Elo rating
 $defaultElo = 1000;
 
@@ -31,6 +30,16 @@ function calculateElo($ratingWinner, $ratingLoser, $K, $result) {
 function updateEloRating($conn, $subject_id, $category, $newElo) {
     $stmt = $conn->prepare("INSERT INTO elo_ratings (subject_id, category, ELO) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE ELO = ?");
     $stmt->bind_param("isii", $subject_id, $category, $newElo, $newElo);
+    $stmt->execute();
+    $stmt->close();
+}
+
+// Log user vote
+function logUserVote($conn, $winner, $loser, $category) {
+    $stmt = $conn->prepare("INSERT INTO user_votes (user_id, subject1_id, subject2_id, voted_subject_id, vote_timestamp) VALUES (?, ?, ?, ?, NOW())");
+    // Replace 1 with the actual user ID once you have user authentication implemented
+    $userId = $_SESSION['userid']; 
+    $stmt->bind_param("iiii", $userId, $winner, $loser, $winner); // Assuming the winner's subject ID is logged
     $stmt->execute();
     $stmt->close();
 }
@@ -62,6 +71,9 @@ $newElo = calculateElo($eloWinner, $eloLoser, $K, $result);
 // Update Elo ratings in the database
 updateEloRating($conn, $winner, $category, $newElo['winner']);
 updateEloRating($conn, $loser, $category, $newElo['loser']);
+
+// Log user vote
+logUserVote($conn, $winner, $loser, $category);
 
 // Close the database connection
 $conn->close();
