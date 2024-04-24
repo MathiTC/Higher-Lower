@@ -29,17 +29,17 @@ body {
 
 .button {
     display: inline-block;
-    padding: 10px 20px;
-    background-color: blue; /* Change background color */
-    color: white; /* Change text color */
+    padding: 5px 5px;
+    background-color: white; /* Change background color */
+    color: black; /* Change text color */
     text-decoration: none; /* Remove underline */
     border: none; /* Remove border */
     border-radius: 5px; /* Add rounded corners */
 }
 
 .button:hover {
-    background-color: darkblue; /* Change background color on hover */
-    color: white; /* Change text color on hover */
+    background-color: white; /* Change background color on hover */
+    color: black; /* Change text color on hover */
 }
 
 
@@ -78,4 +78,23 @@ body {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Drop shadow */
+}
+
+
+/* Ranking Styles */
+.subject-rankings {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.subject-item {
+    flex-basis: calc(33.33% - 10px); /* 1/3 of container width with margin */
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.subject-image {
+    width: 100%;
+    height: auto;
 }
