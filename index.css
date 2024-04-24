@@ -48,11 +48,17 @@ body {
 .subjectContainer {
     display: flex;
     justify-content: space-between;
+    height: 70vh; /* Adjust the height as needed */
+    align-items: center; /* Center the images vertically */
 }
 
 .subjectImageContainer {
     width: 49%; /* Roughly 50% width for each image */
     box-sizing: border-box; /* Ensure padding and border are included in the width */
+    height: 100%; /* Take up the full height of the container */
+    display: flex;
+    justify-content: center; /* Center the image horizontally */
+    align-items: center; /* Center the image vertically */
 }
 
 .subjectImage {
@@ -94,9 +100,14 @@ body {
     flex-basis: calc(33.33% - 10px); /* 1/3 of container width with margin */
     margin-bottom: 20px;
     text-align: center;
+    position: relative; /* Add position relative to ensure image aspect ratio */
+    height: 40vh; /* Set height of container to 25% of viewport height */
 }
 
 .subject-image {
-    width: 100%;
-    height: auto;
+    width: 100%; /* Set width to fill container */
+    height: 100%; /* Set height to fill container */
+    max-width: 100%; /* Ensure image doesn't exceed container width */
+    max-height: 100%; /* Ensure image doesn't exceed container height */
+    object-fit: contain; /* Ensure image fills container while preserving aspect ratio */
 }
