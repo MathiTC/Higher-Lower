@@ -1,4 +1,6 @@
 <?php
+// Start or resume the session
+session_start();
 
 // Include the database configuration file
 require_once 'db_config.php';
