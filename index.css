@@ -27,6 +27,22 @@ body {
     padding: 20px;
 }
 
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: blue; /* Change background color */
+    color: white; /* Change text color */
+    text-decoration: none; /* Remove underline */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+.button:hover {
+    background-color: darkblue; /* Change background color on hover */
+    color: white; /* Change text color on hover */
+}
+
+
 /* High or Low styles */
 
 .subjectContainer {

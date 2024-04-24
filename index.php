@@ -38,7 +38,7 @@ if ($result->num_rows > 0) {
             <option value="<?php echo $category; ?>"><?php echo $category; ?></option>
         <?php endforeach; ?>
     </select>
-
+    <a href="EloRankings.php" class="button">Rankings</a>
     <div>    
     <?php
     // Check if user is logged in

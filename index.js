@@ -75,15 +75,13 @@ $(document).ready(function() {
         // Get the selected winner and loser
         var winner = $(this).find("img").attr("alt"); // Get the alt attribute of the clicked image
         var loser = $(this).siblings().find("img").attr("alt"); // Get the alt attribute of the other image
-        
-        // Get the selected category
-        var selectedCategory = $("#categoryPicker").val();
+        var selectedCategory = $("#categoryPicker").val(); // Get the selected category
         
         // Submit the winner, loser, and selectedCategory data
         var formData = {
             winner: winner,
             loser: loser,
-            category: selectedCategory // Include selected category in formData
+            category: selectedCategory
         };
         $.ajax({
             url: "EloRating.php",
