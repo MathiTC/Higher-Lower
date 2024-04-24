@@ -9,7 +9,8 @@ if (isset($_GET['category']) && !empty($_GET['category'])) {
     $category = mysqli_real_escape_string($conn, $_GET['category']);
     
     // Fetch two random subjects from the specified category
-    $sql = "SELECT subject_name, subject_image, subject_id FROM subjects 
+    $sql = "SELECT subjects.subject_name, subjects.subject_image, subjects.subject_id 
+            FROM subjects 
             INNER JOIN subject_category ON subjects.subject_id = subject_category.subject_id 
             INNER JOIN categories ON subject_category.category_id = categories.category_id 
             WHERE categories.category_name = ? 
