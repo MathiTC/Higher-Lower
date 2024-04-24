@@ -29,7 +29,8 @@ if ($result->num_rows > 0) {
 
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="navbar-logo">Your Logo</div>
+    <div class="navbar-logo">JUST FOR FUN</div>
+    <p>I DON'T OWN IMAGES</p>
 
     <!-- Category Picker -->
     <select id="categoryPicker" class="form-control">
