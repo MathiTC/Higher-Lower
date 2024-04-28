@@ -1,8 +1,0 @@
-# Remove file extensions from URLs
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php [NC,L]
-
-# Set index file to index.php
-DirectoryIndex index.php
