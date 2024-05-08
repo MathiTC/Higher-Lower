@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 import pickle
+from tkinter import messagebox
+from contexts import create_context
 
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -28,10 +30,23 @@ class Contexts(tk.Frame):
         label = tk.Label(self, text="Contexts")
         label.pack(pady=10, padx=10)
 
+        self.entry = tk.Entry(self, width=30)
+        self.entry.pack(pady=5)
+
+        # Create a button to trigger the command
+        self.button = tk.Button(self, text="Create Context", command=self.create_context_command)
+        self.button.pack(pady=5)
+
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
         self.back_button.pack()
 
-
+    def create_context_command(self):
+        context_text = self.entry.get()
+        if context_text:
+            context_id = create_context(context_text)  # Assuming create_context function is accessible here
+            messagebox.showinfo("Context Created", f"Context created with ID: {context_id}")
+        else:
+            messagebox.showerror("Error", "Please enter a context text.")
 
 
 class Elements(tk.Frame):
