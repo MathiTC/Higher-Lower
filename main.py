@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import pickle
 from tkinter import messagebox
-from contexts import create_context
+from elements import store_element
+import contexts
 
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -15,7 +16,7 @@ class HomePage(tk.Frame):
         button1 = tk.Button(self, text="Manage Contexts", command=lambda: controller.show_frame("Contexts"))
         button1.pack()
 
-        button2 = tk.Button(self, text="Manage Elemtents", command=lambda: controller.show_frame("Elements"))
+        button2 = tk.Button(self, text="Manage Elements", command=lambda: controller.show_frame("Elements"))
         button2.pack()
 
         button3 = tk.Button(self, text="Rate", command=lambda: controller.show_frame("Rating"))
@@ -57,8 +58,38 @@ class Elements(tk.Frame):
         label = tk.Label(self, text="Elements")
         label.pack(pady=10, padx=10)
 
+        # Dropdown menu to choose context
+        self.context_var = tk.StringVar()
+        self.context_dropdown = tk.OptionMenu(self, self.context_var, *contexts.get_contexts(), command=self.display_context)
+        self.context_dropdown.pack(pady=5)
+
+        # Label to display selected context
+        self.context_label = tk.Label(self)
+        self.context_label.pack(pady=5)
+
+        # Entry field for RGB code
+        self.rgb_entry = tk.Entry(self, width=30)
+        self.rgb_entry.pack(pady=5)
+
+        # Button to add new element with RGB code
+        self.add_button = tk.Button(self, text="Store Element", command=self.store_element_command)
+        self.add_button.pack(pady=5)
+
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
         self.back_button.pack()
+
+    def display_context(self, *args):
+        selected_context = self.context_var.get()
+        if selected_context:
+            self.context_label.config(text=f"Selected Context: {selected_context}")
+
+    def store_element_command(self):
+        selected_context = self.context_var.get()
+        rgb_code = self.rgb_entry.get()
+        if selected_context and rgb_code:
+            store_element(selected_context, rgb_code)
+        else:
+            print("Please select a context and enter an RGB code.")
 
 
 
@@ -90,7 +121,7 @@ class Voting(tk.Frame):
 class SinglePageApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("FodboldTur")
+        self.title("ELO TEST")
 
         self.container = tk.Frame(self)
         self.container.pack(side="top", fill="both", expand=True)

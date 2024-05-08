@@ -33,3 +33,14 @@ def create_context(context_text):
             pickle.dump(elements, file)
 
     return context_id
+
+
+
+def get_contexts():
+    try:
+        with open('Contexts.pkl', 'rb') as file:
+            contexts_data = pickle.load(file)
+            return list(contexts_data.values())  # Return context texts instead of IDs
+    except FileNotFoundError:
+        print("Contexts file not found.")
+        return []
