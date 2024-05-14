@@ -33,4 +33,12 @@ def store_element(context_id, rgb_color):
         return None
 
 
-
+def get_elements_rating(context_id):
+    try:
+        with open(f'{context_id}.pk', 'rb') as file:
+            contexts_data = pickle.load(file)
+            # Return a list of tuples (context_id, context_text)
+            return list(contexts_data.items())
+    except FileNotFoundError:
+        print("Contexts file not found.")
+        return []

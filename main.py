@@ -43,7 +43,7 @@ class Contexts(tk.Frame):
     def create_context_command(self):
         context_text = self.entry.get()
         if context_text:
-            context_id = create_context(context_text)  # Assuming create_context function is accessible here
+            context_id = create_context(context_text)
             messagebox.showinfo("Context Created", f"Context created with ID: {context_id}")
         else:
             messagebox.showerror("Error", "Please enter a context text.")
@@ -57,25 +57,9 @@ class Elements(tk.Frame):
         label = tk.Label(self, text="Elements")
         label.pack(pady=10, padx=10)
 
-        # Dropdown menu to choose context
         self.context_var = tk.StringVar()
-
-        # Get the list of contexts
-        contexts_list = get_contexts()
-
-        if contexts_list:
-            # Set the initial selection to the first context
-            initial_context_id, initial_context_text = contexts_list[0]
-            self.context_var.set(initial_context_id)  # Set the initial selection to the first context ID
-
-            # Create the OptionMenu with the list of context texts as labels
-            self.context_dropdown = tk.OptionMenu(self, self.context_var, *[context_text for context_id, context_text in
-                                                                            contexts_list], command=self.display_context)
-            self.context_dropdown.pack(pady=5)
-        else:
-            # If no contexts are available, display a message
-            message_label = tk.Label(self, text="No contexts found.")
-            message_label.pack(pady=5)
+        self.context_dropdown = tk.OptionMenu(self, self.context_var, "")
+        self.context_dropdown.pack(pady=5)
 
         # Label to display selected context
         self.context_label = tk.Label(self)
@@ -91,6 +75,28 @@ class Elements(tk.Frame):
 
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
         self.back_button.pack()
+
+        self.refresh_contents()
+
+    def refresh_contents(self):
+        # Get the list of contexts
+        contexts_list = get_contexts()
+
+        # Clear existing options in the dropdown
+        self.context_dropdown["menu"].delete(0, "end")
+
+        if contexts_list:
+            for context_id, context_text in contexts_list:
+                self.context_dropdown["menu"].add_command(
+                    label=context_text,
+                    command=lambda value=context_text: self.context_var.set(value)
+                )
+
+            self.context_var.set(contexts_list[0][1])  # Set the initial selection to the first context text
+            self.display_context()
+        else:
+            self.context_var.set("")
+            self.context_label.config(text="No contexts found.")
 
     def display_context(self, *args):
         selected_context_text = self.context_var.get()
@@ -162,6 +168,10 @@ class SinglePageApp(tk.Tk):
         # Show a frame for the given page name
         frame = self.frames[page_name]
         frame.tkraise()
+
+        # Update page contents
+        if page_name == "Elements" or page_name == "Rating" or page_name == "Voting":
+            frame.refresh_contents()
 
 
 if __name__ == "__main__":
