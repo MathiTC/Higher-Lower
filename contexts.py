@@ -1,10 +1,11 @@
 import os
 import pickle
 
+
 def create_context(context_text):
     # Load or initialize the main contexts dictionary
-    if os.path.exists('Contexts.pkl'):
-        with open('Contexts.pkl', 'rb') as file:
+    if os.path.exists('Contexts.pk'):
+        with open('Contexts.pk', 'rb') as file:
             contexts = pickle.load(file)
     else:
         contexts = {}
@@ -22,11 +23,11 @@ def create_context(context_text):
     contexts[context_id] = context_text
 
     # Save the main contexts dictionary back to file
-    with open('Contexts.pkl', 'wb') as file:
+    with open('Contexts.pk', 'wb') as file:
         pickle.dump(contexts, file)
 
     # Create or update the context-specific file
-    context_file = f'{context_id}.pkl'
+    context_file = f'{context_id}.pk'
     if not os.path.exists(context_file):
         with open(context_file, 'wb') as file:
             elements = {}
@@ -35,12 +36,12 @@ def create_context(context_text):
     return context_id
 
 
-
 def get_contexts():
     try:
-        with open('Contexts.pkl', 'rb') as file:
+        with open('Contexts.pk', 'rb') as file:
             contexts_data = pickle.load(file)
-            return list(contexts_data.values())  # Return context texts instead of IDs
+            # Return a list of tuples (context_id, context_text)
+            return list(contexts_data.items())
     except FileNotFoundError:
         print("Contexts file not found.")
         return []

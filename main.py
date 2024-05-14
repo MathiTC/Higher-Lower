@@ -1,9 +1,8 @@
 import tkinter as tk
-from tkinter import ttk
-import pickle
 from tkinter import messagebox
 from elements import store_element
-import contexts
+from contexts import get_contexts, create_context
+
 
 class HomePage(tk.Frame):
     def __init__(self, parent, controller):
@@ -60,8 +59,23 @@ class Elements(tk.Frame):
 
         # Dropdown menu to choose context
         self.context_var = tk.StringVar()
-        self.context_dropdown = tk.OptionMenu(self, self.context_var, *contexts.get_contexts(), command=self.display_context)
-        self.context_dropdown.pack(pady=5)
+
+        # Get the list of contexts
+        contexts_list = get_contexts()
+
+        if contexts_list:
+            # Set the initial selection to the first context
+            initial_context_id, initial_context_text = contexts_list[0]
+            self.context_var.set(initial_context_id)  # Set the initial selection to the first context ID
+
+            # Create the OptionMenu with the list of context texts as labels
+            self.context_dropdown = tk.OptionMenu(self, self.context_var, *[context_text for context_id, context_text in
+                                                                            contexts_list], command=self.display_context)
+            self.context_dropdown.pack(pady=5)
+        else:
+            # If no contexts are available, display a message
+            message_label = tk.Label(self, text="No contexts found.")
+            message_label.pack(pady=5)
 
         # Label to display selected context
         self.context_label = tk.Label(self)
@@ -79,18 +93,26 @@ class Elements(tk.Frame):
         self.back_button.pack()
 
     def display_context(self, *args):
-        selected_context = self.context_var.get()
-        if selected_context:
-            self.context_label.config(text=f"Selected Context: {selected_context}")
+        selected_context_text = self.context_var.get()
+        selected_context_id = self.get_context_id(selected_context_text)
+        if selected_context_id:
+            self.context_label.config(text=f"Selected Context: {selected_context_text} (ID: {selected_context_id})")
+
+    def get_context_id(self, context_text):
+        contexts_list = get_contexts()
+        for context_id, context in contexts_list:
+            if context == context_text:
+                return context_id
+        return None
 
     def store_element_command(self):
-        selected_context = self.context_var.get()
+        selected_context_text = self.context_var.get()
+        selected_context_id = self.get_context_id(selected_context_text)
         rgb_code = self.rgb_entry.get()
-        if selected_context and rgb_code:
-            store_element(selected_context, rgb_code)
+        if selected_context_id and rgb_code:
+            store_element(selected_context_id, rgb_code)
         else:
             print("Please select a context and enter an RGB code.")
-
 
 
 class Rating(tk.Frame):
@@ -105,8 +127,6 @@ class Rating(tk.Frame):
         self.back_button.pack()
 
 
-
-
 class Voting(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -114,8 +134,6 @@ class Voting(tk.Frame):
 
         label = tk.Label(self, text="Rating")
         label.pack(pady=10, padx=10)
-
-
 
 
 class SinglePageApp(tk.Tk):
