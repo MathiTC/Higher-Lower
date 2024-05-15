@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from elements import store_element, get_two_random_elements
 from contexts import get_contexts, create_context
+from Elo import updating_elo
 
 
 class HomePage(tk.Frame):
@@ -180,10 +181,10 @@ class Voting(tk.Frame):
         self.box2_color = None
 
         # Create two clickable boxes
-        self.box1 = tk.Button(self, text="", width=20, height=10, command=lambda: self.process_vote(self.box1_element_id))
+        self.box1 = tk.Button(self, text="", width=20, height=10, command=lambda: self.process_vote(self.box1_element_id, self.box2_element_id))
         self.box1.pack(side="left", padx=10, pady=10)
 
-        self.box2 = tk.Button(self, text="", width=20, height=10, command=lambda: self.process_vote(self.box2_element_id))
+        self.box2 = tk.Button(self, text="", width=20, height=10, command=lambda: self.process_vote(self.box2_element_id, self.box1_element_id))
         self.box2.pack(side="right", padx=10, pady=10)
 
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
@@ -242,12 +243,15 @@ class Voting(tk.Frame):
                 return context_id
         return None
 
-    def process_vote(self, selected_element_id):
+    def process_vote(self, winner, loser):
+        selected_context_text = self.context_var.get()
+        context_id = self.get_context_id(selected_context_text)
         age = getattr(self.controller, 'age', None)
         gender = getattr(self.controller, 'gender', None)
         if age and gender:
-            print(f"Box {selected_element_id} clicked with Age: {age}, Gender: {gender}")
-            # Add your logic here
+            print(f"Box {winner} Wins and {loser} loses with Age: {age}, Gender: {gender}")
+            updating_elo(winner, loser, context_id, age, gender)
+            self.refresh_boxes()
         else:
             tk.messagebox.showerror("Data Missing",
                                     "Age and Gender data are missing. Please enter them in the Rating page.")
