@@ -1,4 +1,5 @@
 import os
+import random
 import pickle
 
 
@@ -33,12 +34,20 @@ def store_element(context_id, rgb_color):
         return None
 
 
-def get_elements_rating(context_id):
+def get_elements(context_id):
     try:
         with open(f'{context_id}.pk', 'rb') as file:
-            rating_elements_data = pickle.load(file)
+            elements_data = pickle.load(file)
             # Return a list of tuples (context_id, context_text)
-            return list(rating_elements_data.items())
+            return list(elements_data.items())
     except FileNotFoundError:
         print("Contexts file not found.")
         return []
+
+
+def get_two_random_elements(context_id):
+    elements = get_elements(context_id)
+    if len(elements) < 2:
+        print("Not enough elements to select from.")
+        return None, None
+    return random.sample(elements, 2)

@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-import pickle
-from elements import store_element, get_elements_rating
+from elements import store_element, get_two_random_elements
 from contexts import get_contexts, create_context
 
 
@@ -77,9 +76,9 @@ class Elements(tk.Frame):
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
         self.back_button.pack()
 
-        self.refresh_contexts()
+        self.refresh_contents()
 
-    def refresh_contexts(self):
+    def refresh_contents(self):
         # Get the list of contexts
         contexts_list = get_contexts()
 
@@ -171,26 +170,27 @@ class Voting(tk.Frame):
 
         # Dropdown menu to choose context
         self.context_var = tk.StringVar()
-        self.context_dropdown = tk.OptionMenu(self, self.context_var, "")
+        self.context_dropdown = tk.OptionMenu(self, self.context_var, "", command=self.on_context_select)
         self.context_dropdown.pack(pady=5)
 
-        self.refresh_contents()
+        # Elements for the two boxes
+        self.box1_element_id = None
+        self.box2_element_id = None
+        self.box1_color = None
+        self.box2_color = None
 
-        # Create a frame to hold the color boxes
-        self.color_frame = tk.Frame(self)
-        self.color_frame.pack(fill="both", expand=True)
+        # Create two clickable boxes
+        self.box1 = tk.Button(self, text="", width=20, height=10, command=lambda: self.process_vote(self.box1_element_id))
+        self.box1.pack(side="left", padx=10, pady=10)
 
-        # Create two boxes for RGB colors
-        self.box1 = tk.Label(self.color_frame, text="", bg="red", width=20, height=10, relief="raised")
-        self.box1.pack(side="left", expand=True, fill="both", padx=10, pady=10)
-        self.box1.bind("<Button-1>", self.box1_clicked)
-
-        self.box2 = tk.Label(self.color_frame, text="", bg="blue", width=20, height=10, relief="raised")
-        self.box2.pack(side="right", expand=True, fill="both", padx=10, pady=10)
-        self.box2.bind("<Button-1>", self.box2_clicked)
+        self.box2 = tk.Button(self, text="", width=20, height=10, command=lambda: self.process_vote(self.box2_element_id))
+        self.box2.pack(side="right", padx=10, pady=10)
 
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
         self.back_button.pack(pady=10)
+
+        # Refresh contents to populate context dropdown
+        self.refresh_contents()
 
     def refresh_contents(self):
         contexts_list = get_contexts()
@@ -205,19 +205,35 @@ class Voting(tk.Frame):
                 )
 
             self.context_var.set(contexts_list[0][1])  # Set the initial selection to the first context text
+            self.on_context_select(contexts_list[0][1])  # Refresh boxes for the initial context
         else:
             self.context_var.set("")
+            self.refresh_boxes()
+
+    def on_context_select(self, value):
+        self.context_var.set(value)
+        self.refresh_boxes()
 
     def refresh_boxes(self):
         selected_context_text = self.context_var.get()
         selected_context_id = self.get_context_id(selected_context_text)
+
         if selected_context_id:
-            elements = self.get_elements(selected_context_id)
-            if elements:
-                rgb_colors = list(elements.values())
-                if len(rgb_colors) >= 2:
-                    self.box1.config(bg=rgb_colors[0])
-                    self.box2.config(bg=rgb_colors[1])
+            element1, element2 = get_two_random_elements(selected_context_id)
+            print(element1)
+            print(element2)
+            if element1 and element2:
+                self.box1_element_id, self.box1_color = element1
+                self.box2_element_id, self.box2_color = element2
+
+                self.box1.config(bg=self.box1_color)
+                self.box2.config(bg=self.box2_color)
+            else:
+                self.box1.config(text="No element", bg="white")
+                self.box2.config(text="No element", bg="white")
+        else:
+            self.box1.config(text="No element", bg="white")
+            self.box2.config(text="No element", bg="white")
 
     def get_context_id(self, context_text):
         contexts_list = get_contexts()
@@ -226,26 +242,11 @@ class Voting(tk.Frame):
                 return context_id
         return None
 
-    def get_elements(self, context_id):
-        try:
-            with open(f"{context_id}.pickle", "rb") as f:
-                data = pickle.load(f)
-            return data
-        except FileNotFoundError:
-            print("Context file not found.")
-            return {}
-
-    def box1_clicked(self, event):
-        self.process_vote(1)
-
-    def box2_clicked(self, event):
-        self.process_vote(2)
-
-    def process_vote(self, box_number):
+    def process_vote(self, selected_element_id):
         age = getattr(self.controller, 'age', None)
         gender = getattr(self.controller, 'gender', None)
         if age and gender:
-            print(f"Box {box_number} clicked with Age: {age}, Gender: {gender}")
+            print(f"Box {selected_element_id} clicked with Age: {age}, Gender: {gender}")
             # Add your logic here
         else:
             tk.messagebox.showerror("Data Missing",
