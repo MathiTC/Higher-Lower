@@ -45,3 +45,5 @@ def get_contexts():
     except FileNotFoundError:
         print("Contexts file not found.")
         return []
+
+
