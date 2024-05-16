@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
-from elements import store_element, get_two_random_elements
+from elements import store_element, get_two_random_elements, get_elements
 from contexts import get_contexts, create_context
-from Elo import updating_elo
+from Elo import updating_elo, fetch_elos
 
 
 class HomePage(tk.Frame):
@@ -21,6 +21,9 @@ class HomePage(tk.Frame):
 
         button3 = tk.Button(self, text="Rate", command=lambda: controller.show_frame("Rating"))
         button3.pack()
+
+        button4 = tk.Button(self, text="Display", command=lambda: controller.show_frame("Display"))
+        button4.pack()
 
 
 class Contexts(tk.Frame):
@@ -257,6 +260,64 @@ class Voting(tk.Frame):
                                     "Age and Gender data are missing. Please enter them in the Rating page.")
 
 
+class Display(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+
+        label = tk.Label(self, text="Display")
+        label.pack(pady=10, padx=10)
+
+        self.context_var = tk.StringVar()
+        self.context_dropdown = tk.OptionMenu(self, self.context_var, "")
+        self.context_dropdown.pack(pady=5)
+
+        # Label to display selected context
+        self.context_label = tk.Label(self)
+        self.context_label.pack(pady=5)
+
+        display_rating(self)
+
+        self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
+        self.back_button.pack()
+
+
+  def display_context(self, *args):
+        selected_context_text = self.context_var.get()
+        selected_context_id = self.get_context_id(selected_context_text)
+        if selected_context_id:
+            self.context_label.config(text=f"Selected Context: {selected_context_text} (ID: {selected_context_id})")
+
+    def get_context_id(self, context_text):
+        contexts_list = get_contexts()
+        for context_id, context in contexts_list:
+            if context == context_text:
+                return context_id
+        return None
+
+    def on_context_select(self, value):
+        self.context_var.set(value)
+        self.refresh_boxes()
+
+def display_rating (self):
+    selected_context_text = self.context_var.get()
+    selected_context_id = self.get_context_id(selected_context_text)
+    elements = get_elements(selected_context_id)
+    ratings = fetch_elos(selected_context_id, 'age')
+
+    # Saml id, farve og elo-rating
+    combined_data = []
+    for element_id, color in elements:
+        if element_id in ratings:
+            combined_data.append((element_id, color, ratings[element_id]))
+
+    # Sortér efter elo-rating, højeste først
+    sorted_data = sorted(combined_data, key=lambda x: x[2], reverse=True)
+
+    # Udskriv resultaterne
+    for data in sorted_data:
+        print(f"ID: {data[0]}, Color: {data[1]}, Elo: {data[2]}")
+
 class SinglePageApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -272,7 +333,7 @@ class SinglePageApp(tk.Tk):
 
     def create_frames(self):
         # Define all frames/pages here
-        pages = [HomePage, Contexts, Elements, Rating, Voting]
+        pages = [HomePage, Contexts, Elements, Rating, Voting, Display]
 
         for F in pages:
             frame = F(self.container, self)
