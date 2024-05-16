@@ -64,7 +64,9 @@ def fetch_elos(context_id, parameter):
             else:
                 return []
     except FileNotFoundError:
-        print("Contexts file not found.")
+        print("Elo file not found.")
+        print(context_id)
+        print(parameter)
         return []
     except EOFError:
         print("File is empty.")

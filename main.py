@@ -269,20 +269,51 @@ class Display(tk.Frame):
         label.pack(pady=10, padx=10)
 
         self.context_var = tk.StringVar()
+        self.context_var.trace('w', self.on_context_select)
         self.context_dropdown = tk.OptionMenu(self, self.context_var, "")
         self.context_dropdown.pack(pady=5)
 
-        # Label to display selected context
         self.context_label = tk.Label(self)
         self.context_label.pack(pady=5)
 
-        display_rating(self)
+        self.parameter_string = tk.StringVar()
+        self.parameter_string.trace('w', self.on_parameter_select)
+        self.parameter_dropdown = tk.OptionMenu(self, self.parameter_string, "Male", "Female", "18", "19")
+        self.parameter_dropdown.pack(pady=5)
+
+        self.parameter_label = tk.Label(self)
+        self.parameter_label.pack(pady=5)
+
+        self.listbox = tk.Listbox(self)
+        self.listbox.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
 
         self.back_button = tk.Button(self, text="Back to Home", command=lambda: controller.show_frame("HomePage"))
         self.back_button.pack()
 
+        # Refresh contents to populate context dropdown
+        self.refresh_contents()
+        self.display_rating()
 
-  def display_context(self, *args):
+    def refresh_contents(self):
+        contexts_list = get_contexts()
+
+        self.context_dropdown["menu"].delete(0, "end")
+
+        if contexts_list:
+            for context_id, context_text in contexts_list:
+                self.context_dropdown["menu"].add_command(
+                    label=context_text,
+                    command=lambda value=context_text: self.context_var.set(value)
+                )
+
+            self.context_var.set(contexts_list[0][1])  # Set the initial selection to the first context text
+            self.on_context_select(contexts_list[0][1])  # Refresh boxes for the initial context
+        else:
+            self.context_var.set("")
+
+        self.parameter_string.set("Male")  # Default parameter selection
+
+    def display_context(self, *args):
         selected_context_text = self.context_var.get()
         selected_context_id = self.get_context_id(selected_context_text)
         if selected_context_id:
@@ -295,28 +326,47 @@ class Display(tk.Frame):
                 return context_id
         return None
 
-    def on_context_select(self, value):
-        self.context_var.set(value)
-        self.refresh_boxes()
+    def on_context_select(self, *args):
+        selected_context_text = self.context_var.get()
+        selected_context_id = self.get_context_id(selected_context_text)
+        self.context_label.config(text=f"Selected Context: {selected_context_text} (ID: {selected_context_id})")
+        self.display_rating()
 
-def display_rating (self):
-    selected_context_text = self.context_var.get()
-    selected_context_id = self.get_context_id(selected_context_text)
-    elements = get_elements(selected_context_id)
-    ratings = fetch_elos(selected_context_id, 'age')
+    def display_parameter(self, *args):
+        selected_parameter_text = self.parameter_string.get()
+        self.parameter_label.config(text=f"Selected Parameter: {selected_parameter_text}")
 
-    # Saml id, farve og elo-rating
-    combined_data = []
-    for element_id, color in elements:
-        if element_id in ratings:
-            combined_data.append((element_id, color, ratings[element_id]))
+    def on_parameter_select(self, *args):
+        self.display_rating()
 
-    # Sortér efter elo-rating, højeste først
-    sorted_data = sorted(combined_data, key=lambda x: x[2], reverse=True)
+    def display_rating(self):
+        self.listbox.delete(0, tk.END)
+        selected_context_text = self.context_var.get()
+        selected_context_id = self.get_context_id(selected_context_text)
+        selected_parameter = self.parameter_string.get()
+        print(selected_context_id)
+        print(selected_parameter)
+        elements = get_elements(selected_context_id)
+        print(elements)
+        ratings = fetch_elos(selected_context_id, selected_parameter)
+        print(ratings)
 
-    # Udskriv resultaterne
-    for data in sorted_data:
-        print(f"ID: {data[0]}, Color: {data[1]}, Elo: {data[2]}")
+        # Saml id, farve og elo-rating
+        combined_data = []
+        for element_id, color in elements:
+            for rating_id, rating_value in ratings:
+                if element_id == rating_id:
+                    combined_data.append((element_id, color, rating_value))
+
+        # Sortér efter elo-rating, højeste først
+        print(combined_data)
+        sorted_data = sorted(combined_data, key=lambda x: x[2], reverse=True)
+        print(sorted_data)
+
+        # Udskriv resultaterne
+        for data in sorted_data:
+            self.listbox.insert(tk.END, f"ID: {data[0]}, Color: {data[1]}, Elo: {data[2]}")
+
 
 class SinglePageApp(tk.Tk):
     def __init__(self):
